@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EclipseCraft - Приватный сервер</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a0a1a 50%, #0a0a1a 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        /* Анимированные частицы на фоне */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+        
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: #8a2be2;
+            border-radius: 50%;
+            animation: float 15s infinite linear;
+            opacity: 0.3;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.3;
+            }
+            90% {
+                opacity: 0.3;
+            }
+            100% {
+                transform: translateY(-10px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        /* Навигация */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background: rgba(10, 10, 10, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid #8a2be2;
+            padding: 1rem 0;
+            z-index: 100;
+        }
+        
+        nav .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #8a2be2;
+            text-shadow: 0 0 10px #8a2be2;
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+        
+        .nav-links a {
+            color: #e0e0e0;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+        }
+        
+        .nav-links a:hover {
+            color: #8a2be2;
+            background: rgba(138, 43, 226, 0.1);
+            box-shadow: 0 0 20px rgba(138, 43, 226, 0.3);
+        }
+        
+        /* Основной контент */
+        main {
+            position: relative;
+            z-index: 10;
+            padding-top: 80px;
+        }
+        
+        .section {
+            min-height: 100vh;
+            padding: 4rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+        }
+        
+        /* Главная секция */
+        .hero {
+            text-align: center;
+            background: radial-gradient(circle at center, rgba(138, 43, 226, 0.1) 0%, transparent 70%);
+        }
+        
+        .hero h1 {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #ffffff, #8a2be2, #ffffff);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { filter: drop-shadow(0 0 20px #8a2be2); }
+            to { filter: drop-shadow(0 0 30px #8a2be2); }
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.8;
+        }
+        
+        .server-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            border: 1px solid #8a2be2;
+            margin-bottom: 2rem;
+        }
+        
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #00ff00;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(0, 255, 0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0); }
+        }
+        
+        /* Секции контента */
+        .content-section {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(138, 43, 226, 0.3);
+            border-radius: 12px;
+            padding: 3rem;
+            margin: 2rem 0;
+            backdrop-filter: blur(10px);
+        }
+        
+        .content-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            color: #8a2be2;
+            text-align: center;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .info-card {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(138, 43, 226, 0.5);
+            border-radius: 8px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+        
+        .info-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(138, 43, 226, 0.3);
+            border-color: #8a2be2;
+        }
+        
+        .info-card h3 {
+            color: #ffffff;
+            margin-bottom: 1rem;
+            font-size: 1.3rem;
+        }
+        
+        .info-card p {
+            opacity: 0.8;
+            line-height: 1.6;
+        }
+        
+        /* Правила */
+        .rules-list {
+            list-style: none;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .rules-list li {
+            background: rgba(0, 0, 0, 0.5);
+            border-left: 4px solid #8a2be2;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1rem;
+            border-radius: 0 8px 8px 0;
+            transition: all 0.3s ease;
+        }
+        
+        .rules-list li:hover {
+            background: rgba(138, 43, 226, 0.1);
+            transform: translateX(5px);
+        }
+        
+        .rules-list li::before {
+            content: "▸ ";
+            color: #8a2be2;
+            font-weight: bold;
+        }
+        
+        /* Форма заявки */
+        .application-form {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid rgba(138, 43, 226, 0.5);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #8a2be2;
+            font-weight: 500;
+        }
+        
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(0, 0, 0, 0.7);
+            border: 1px solid rgba(138, 43, 226, 0.5);
+            border-radius: 6px;
+            color: #ffffff;
+            font-family: inherit;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #8a2be2;
+            box-shadow: 0 0 10px rgba(138, 43, 226, 0.3);
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(45deg, #8a2be2, #4b0082);
+            border: none;
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(138, 43, 226, 0.4);
+        }
+        
+        /* Контакты */
+        .contacts {
+            text-align: center;
+        }
+        
+        .contact-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .contact-link {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1rem 2rem;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(138, 43, 226, 0.5);
+            border-radius: 8px;
+            color: #ffffff;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .contact-link:hover {
+            background: rgba(138, 43, 226, 0.2);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(138, 43, 226, 0.3);
+        }
+        
+        /* Футер */
+        footer {
+            text-align: center;
+            padding: 2rem;
+            border-top: 1px solid rgba(138, 43, 226, 0.3);
+            opacity: 0.7;
+        }
+        
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.5rem; }
+            .nav-links { display: none; }
+            .contact-links { flex-direction: column; }
+            .info-grid { grid-template-columns: 1fr; }
+        }
+        
+        /* Скролл */
+        html {
+            scroll-behavior: smooth;
+        }
+        
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #0a0a0a;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #8a2be2;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Анимированные частицы -->
+    <div class="particles" id="particles"></div>
+    
+    <!-- Навигация -->
+    <nav>
+        <div class="container">
+            <div class="logo">KRAKEN</div>
+            <ul class="nav-links">
+                <li><a href="#home">Главная</a></li>
+                <li><a href="#about">О сервере</a></li>
+                <li><a href="#rules">Правила</a></li>
+                <li><a href="#apply">Подать заявку</a></li>
+                <li><a href="#contacts">Контакты</a></li>
+            </ul>
+        </div>
+    </nav>
+    
+    <main>
+        <!-- Главная секция -->
+        <section id="home" class="section hero">
+            <div class="container">
+                <h1>KRAKEN</h1>
+                <p>приветствую дорогй пабгер </p>
+                
+                <div class="server-status">
+                    <div class="status-dot"></div>
+                    <span></span>
+                </div>
+                
+                <p>Добро пожаловать в мир модифекаци пабга</p>
+            </div>
+        </section>
+        
+        <!-- О сервере -->
+        <section id="about" class="section">
+            <div class="container">
+                <div class="content-section">
+                    <h2>О КФГ</h2>
+                    <div class="info-grid">
+                        <div class="info-card">
+                            <h3>🌙 Концепция</h3>
+                            <p>кфг это заменение файлоа </p>
+                        </div>
+                        <div class="info-card">
+                            <h3>⚡ поее<h3>
+                            <p>в каждом файле код <br>Bedrock Edon: 1.21.70-1.21.100<br>Кроссплатформенная поддержка</p>
+                        </div>
+                        <div class="info-card">
+                            <h3>🎮 Особенности</h3>
+                            <p>Модифицированное выживание с уникальными дополнениями, активное сообщество и совместные проекты.</p>
+                        </div>
+                        <div class="info-card">
+                            <h3>👥 Сообщество</h3>
+                            <p>Небольшое дружное сообщество опытных игроков. Взаимопомощь, креативность и атмосфера взаимного уважения.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Правила -->
+        <section id="rules" class="section">
+            <div class="container">
+                <div class="content-section">
+                    <h2>ПРАВИЛА СЕРВЕРА</h2>
+                    
+                    <h3 style="color: #8a2be2; margin-bottom: 1rem; font-size: 1.5rem;">Правила игры</h3>
+                    <ul class="rules-list">
+                        <li>Запрещён гриф и соучастие в гриферстве в любом виде.</li>
+                        <li>Запрещено убивать игроков и мобов, находящихся на чужой территории.</li>
+                        <li>Запрещено разрушать постройки, механизмы, фермы и т. д. (разрешается ломать только те механизмы/фермы, которые мешают работе сервера).</li>
+                        <li>Запрещено воровство из чужих хранилищ (сундуков, шалкеров, печей, раздатчиков, воронок, рамок и т. д.).</li>
+                        <li>Запрещено убивать или вредить игрокам без причины.</li>
+                        <li>Запрещены косвенные убийства (ловушки, подставы и т. д.).</li>
+                        <li>Использование чужих ферм и механизмов без разрешения запрещено (исключение — общественные фермы).</li>
+                        <li>Запрещён дюп любых видов.</li>
+                        <li>Запрещены моды и читы, облегчающие игру (FreeCam, авто-кликер, AFK-зажим и т. д.). Исключение составляют моды на оптимизацию. (X-Ray моды/текстурпаки также запрещены.)</li>
+                        <li>Запрещено препятствовать игре других игроков.</li>
+                        <li>Запрещено сталкивать игроков с высоты, агрить на них мобов, мешать прохождению.</li>
+                        <li>Запрещён вызов рейда на территории других игроков.</li>
+                        <li>Запрещено создание лаг-машин и любых лагающих механизмов/построек.</li>
+                        <li>Запрещено ломать или ставить блоки на общественных местах или чужой территории. Исключение — временные постройки (например, лестница) или разрушение стены для прохода в недоступное место.</li>
+                        <li>Запрещены взрывы кристаллов, визеров и других объектов, если это портит территории или наносит урон игрокам.</li>
+                        <li>Запрещена продажа вещей или аккаунтов за реальные деньги.</li>
+                        <li>Запрещена передача аккаунта другому человеку.</li>
+                        <li>Запрещены попытки взлома аккаунтов игроков.</li>
+                        <li>Запрещены обман и мошенничество.</li>
+                        <li>Использование багов игры, лазеек в правилах проекта или причинение вреда игрокам строго запрещено.</li>
+                        <li>Запрещён взлом и любая эксплуатация сида мира в личных целях.</li>
+                    </ul>
+                    
+                    <h3 style="color: #8a2be2; margin: 2rem 0 1rem 0; font-size: 1.5rem;">Правила общения в игре и Discord</h3>
+                    <ul class="rules-list">
+                        <li>Запрещён флуд.</li>
+                        <li>Запрещены оскорбления игроков, унижение чести и достоинства. Выяснение отношений происходит вне игры — в личных сообщениях.</li>
+                        <li>Запрещены угрозы убийством или насилием в реальной жизни, а также угрозы грифом или воровством.</li>
+                        <li>Запрещена рассылка рекламы, порнографии в чаты игры и Discord.</li>
+                        <li>Запрещены проявления гомофобии, национализма, фашизма, нацизма, сексизма, расизма, шовинизма и других форм дискриминации. Запрещена любая межнациональная рознь.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Подача заявки -->
+        <section id="apply" class="section">
+            <div class="container">
+                <div class="content-section">
+                    <h2>ПОДАТЬ ЗАЯВКУ</h2>
+                    <p style="text-align: center; margin-bottom: 2rem;">Для подачи заявки на сервер присоединяйтесь к нашему Discord серверу</p>
+                    
+                    <div style="text-align: center;">
+                        <a href="https://discord.gg/MguUvVCv" class="submit-btn" style="display: inline-block; text-decoration: none; max-width: 300px;">
+                            💬 Присоединиться к Discord
+                        </a>
+                        <p style="margin-top: 1rem; opacity: 0.8;">После присоединения найдите канал для подачи заявок</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Контакты -->
+        <section id="contacts" class="section contacts">
+            <div class="container">
+                <div class="content-section">
+                    <h2>пртвет</h2>
+                    <p>Свяжитесь с нами для получения дополнительной информации</p>
+                    
+                    <div class="contact-links">
+                        <a href="https://discord.gg/MguUvVCv" class="contact-link">
+                            <span>💬</span>
+                            <span>Discord Server</span>
+                        </a>
+                        <a href="https://discord.gg/MguUvVCv" class="contact-link">
+                            <span>👑</span>
+                            <span>Администрация</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    
+    <footer>
+        <p>&copy; 2025 EclipseCraft. Создано с любовью к игре.</p>
+    </footer>
+    
+    <script>
+        // Создание анимированных частиц
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 50;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                particlesContainer.appendChild(particle);
+            }
+        }
+        
+        // Обработка формы заявки (удалено, так как теперь используется Discord)
+        
+        // Плавная прокрутка для навигации
+        document.querySelectorAll('nav a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+        
+        // Инициализация
+        document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
+        });
+        
+        // Динамическое обновление статуса сервера (имитация)
+        setInterval(() => {
+            const statusDot = document.querySelector('.status-dot');
+            const onlineCount = Math.floor(Math.random() * 8) + 10; // 10-17 игроков
+            document.querySelector('.server-status span').textContent = `Сервер онлайн • ${onlineCount}/20 игроков`;
+        }, 30000); // Обновление каждые 30 секунд
+    </script>
+</body>
+</html>
